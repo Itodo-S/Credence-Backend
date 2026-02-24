@@ -40,22 +40,25 @@ API runs at [http://localhost:3000](http://localhost:3000). The frontend proxies
 
 ## Scripts
 
-| Command              | Description              |
-|----------------------|--------------------------|
-| `npm run dev`        | Start with tsx watch     |
-| `npm run build`      | Compile TypeScript       |
-| `npm start`          | Run compiled `dist/`     |
-| `npm run lint`       | Run ESLint               |
-| `npm test`           | Run tests                |
-| `npm run test:coverage` | Run tests with coverage |
+| Command                 | Description              |
+|-------------------------|---------------------------|
+| `npm run dev`           | Start with tsx watch     |
+| `npm run build`         | Compile TypeScript       |
+| `npm start`             | Run compiled `dist/`     |
+| `npm run lint`          | Run ESLint               |
+| `npm test`              | Run tests                |
+| `npm run test:watch`    | Run tests in watch mode  |
+| `npm run test:coverage` | Run tests with coverage  |
 
 ## API (current)
 
-| Method | Path                    | Description            |
-|--------|-------------------------|------------------------|
+| Method | Path                         | Description              |
+|--------|------------------------------|---------------------------|
 | GET    | `/api/health`           | Health check           |
 | GET    | `/api/trust/:address`   | Trust score            |
 | GET    | `/api/bond/:address`    | Bond status (stub)     |
+| GET    | `/api/attestations/:address` | Attestations (stub)      |
+| GET    | `/api/verification/:address` | Verification proof (stub)|
 
 Full request/response documentation, cURL examples, and import instructions:
 **[docs/api.md](docs/api.md)**
@@ -125,6 +128,10 @@ You supply:
 State shape is `IdentityState`: `address`, `bondedAmount`, `bondStart`, `bondDuration`, `active`. See `src/listeners/types.ts`.
 
 Tests cover: no drift (no update), single drift (one address corrected), full resync (multiple drifts), chain missing, store-only addresses, and error handling.
+
+## Developer SDK
+
+A TypeScript/JavaScript SDK is available at `src/sdk/` for programmatic access to the API. See [docs/sdk.md](docs/sdk.md) for full documentation.
 
 ## Tech
 

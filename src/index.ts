@@ -1,6 +1,7 @@
 import express from 'express'
 import { createHealthRouter } from './routes/health.js'
 import { createDefaultProbes } from './services/health/probes.js'
+import bulkRouter from './routes/bulk.js'
 
 const app = express()
 const PORT = process.env.PORT ?? 3000
@@ -30,6 +31,25 @@ app.get('/api/bond/:address', (req, res) => {
     bondStart: null,
     bondDuration: null,
     active: false,
+  })
+})
+
+app.get('/api/attestations/:address', (req, res) => {
+  const { address } = req.params
+  res.json({
+    address,
+    attestations: [],
+    count: 0,
+  })
+})
+
+app.get('/api/verification/:address', (req, res) => {
+  const { address } = req.params
+  res.json({
+    address,
+    proof: null,
+    verified: false,
+    timestamp: null,
   })
 })
 
