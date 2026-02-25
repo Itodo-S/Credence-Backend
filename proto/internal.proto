@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package credence.internal;
+
+service InternalService {
+  // Get trust score and bonded amount for a specific address
+  rpc GetTrustScore (TrustScoreRequest) returns (TrustScoreResponse);
+  
+  // Acknowledge identity sync
+  rpc SyncIdentity (SyncIdentityRequest) returns (SyncIdentityResponse);
+}
+
+message TrustScoreRequest {
+  string address = 1;
+}
+
+message TrustScoreResponse {
+  string address = 1;
+  int32 score = 2;
+  string bonded_amount = 3;
+}
+
+message SyncIdentityRequest {
+  string address = 1;
+  string identity_provider = 2;
+  string identity_id = 3;
+}
+
+message SyncIdentityResponse {
+  bool success = 1;
+  string message = 2;
+}

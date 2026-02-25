@@ -1,9 +1,11 @@
 import express from 'express'
 import { createHealthRouter } from './routes/health.js'
 import { createDefaultProbes } from './services/health/probes.js'
+import { startGrpcServer } from './grpc/server.js'
 
 const app = express()
 const PORT = process.env.PORT ?? 3000
+const GRPC_PORT = process.env.GRPC_PORT ?? 50051
 
 app.use(express.json())
 
@@ -33,6 +35,16 @@ app.get('/api/bond/:address', (req, res) => {
   })
 })
 
-app.listen(PORT, () => {
-  console.log(`Credence API listening on http://localhost:${PORT}`)
-})
+async function startServers() {
+  try {
+    await startGrpcServer(GRPC_PORT);
+    app.listen(PORT, () => {
+      console.log(`Credence API listening on http://localhost:${PORT}`)
+    })
+  } catch (error) {
+    console.error('Failed to start servers:', error);
+    process.exit(1);
+  }
+}
+
+startServers();
