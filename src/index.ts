@@ -1,4 +1,6 @@
 import express from 'express'
+import { createHealthRouter } from './routes/health.js'
+import { createDefaultProbes } from './services/health/probes.js'
 
 import { AttestationRepository } from './repositories/attestationRepository.js'
 import { createAttestationRouter } from './routes/attestations.js'
@@ -39,6 +41,14 @@ app.get('/api/bond/:address', (req, res) => {
   })
 })
 
-app.listen(PORT, () => {
-  console.log(`Credence API listening on http://localhost:${PORT}`)
-})
+// Bulk verification endpoint (Enterprise)
+app.use('/api/bulk', bulkRouter)
+
+// Only start server if not in test environment
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`Credence API listening on http://localhost:${PORT}`)
+  })
+}
+
+export default app
