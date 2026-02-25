@@ -12,9 +12,3 @@ export type {
   SlashEvent,
   CreateSlashEventInput,
 } from "./slashEvents.repository.js";
-
-export { ScoreHistoryRepository } from "./scoreHistory.repository.js";
-export type {
-  ScoreHistory,
-  CreateScoreHistoryInput,
-} from "./scoreHistory.repository.js";

@@ -4,23 +4,21 @@ This document describes the database schema for the Credence Backend.
 
 ## Overview
 
-The schema models four core entities in the Credence trust protocol:
+The schema models three core entities in the Credence trust protocol:
 
 - **Identities** — on-chain addresses registered in the system.
 - **Attestations** — verifier-issued trust signals linked to identities.
 - **Slash Events** — penalty records for protocol violations.
-- **Score History** — point-in-time trust score snapshots for identities.
 
 ## Entity Relationship
 
 ```
 identities
   ├── 1:N ──► attestations
-  ├── 1:N ──► slash_events
-  └── 1:N ──► score_history
+  └── 1:N ──► slash_events
 ```
 
-`attestations`, `slash_events`, and `score_history` each hold a foreign key (`identity_id`) referencing `identities(id)` with `ON DELETE CASCADE`.
+Both `attestations` and `slash_events` hold a foreign key (`identity_id`) referencing `identities(id)` with `ON DELETE CASCADE`.
 
 ## Tables
 
@@ -56,17 +54,6 @@ identities
 | timestamp    | TEXT    | NOT NULL, DEFAULT now()       | When the slash occurred             |
 | created_at   | TEXT    | NOT NULL, DEFAULT now()       | ISO 8601 creation timestamp         |
 
-### score_history
-
-| Column        | Type    | Constraints                   | Description                                      |
-| ------------- | ------- | ----------------------------- | ------------------------------------------------ |
-| id            | INTEGER | PRIMARY KEY AUTOINCREMENT     | Unique score history ID                          |
-| identity_id   | INTEGER | NOT NULL, FK → identities(id) | The scored identity                              |
-| score         | REAL    | NOT NULL                      | Trust score at snapshot time                     |
-| snapshot_at   | TEXT    | NOT NULL, DEFAULT now()       | When the score was recorded                      |
-| bond_snapshot | TEXT    | NOT NULL, DEFAULT '0'         | Bonded amount at snapshot (string for precision) |
-| created_at    | TEXT    | NOT NULL, DEFAULT now()       | ISO 8601 creation timestamp                      |
-
 ## Migrations
 
 Migrations are idempotent and use `CREATE TABLE IF NOT EXISTS`. They can be run safely multiple times.
@@ -85,6 +72,5 @@ runMigrations(db);
 
 - **SQLite** is used as the initial database engine. The project is designed to migrate to PostgreSQL when the full architecture is implemented.
 - **Foreign keys** are enforced via `PRAGMA foreign_keys = ON` set in the connection layer.
-- **Cascade deletes** ensure that removing an identity also removes its attestations, slash events, and score history.
-- **Score history** supports querying by identity and time range for historical trust score analysis.
+- **Cascade deletes** ensure that removing an identity also removes its attestations and slash events.
 - **Amount as TEXT**: Slash event amounts are stored as strings to preserve precision for large numbers (e.g. wei values).
