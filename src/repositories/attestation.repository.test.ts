@@ -37,7 +37,7 @@ describe('AttestationRepository', () => {
             rowCount: 1,
             oid: 0,
             fields: [],
-        });
+        } as any);
 
         const result = await repository.upsertAttestation('0xUser', '0xAttester', 'SomeData');
 
@@ -65,7 +65,7 @@ describe('AttestationRepository', () => {
             rowCount: 1,
             oid: 0,
             fields: [],
-        });
+        } as any);
 
         const result = await repository.revokeAttestation('0xUser', '0xAttester', 'SomeData');
 
@@ -83,7 +83,7 @@ describe('AttestationRepository', () => {
             rowCount: 0,
             oid: 0,
             fields: []
-        });
+        } as any);
 
         const result = await repository.revokeAttestation('0xUser', '0xAttester', 'NonExistent');
 

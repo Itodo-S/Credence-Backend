@@ -7,7 +7,7 @@ API and services for the Credence economic trust protocol. Provides health check
 This service is part of [Credence](../README.md). It will support:
 
 - Public query API (trust score, bond status, attestations)
-- Horizon listener for bond/slash events (future)
+- **Horizon listener / identity state sync** – Reconciles DB with on-chain bond state (see [Identity state sync](#identity-state-sync)).
 - Reputation engine (off-chain score from bond data) (future)
 
 ## Prerequisites
@@ -59,13 +59,30 @@ API runs at [http://localhost:3000](http://localhost:3000). The frontend proxies
 
 ## API (current)
 
-| Method | Path               | Description        |
-|--------|--------------------|--------------------|
-| GET    | `/api/health`      | Health check (readiness + dependency status) |
-| GET    | `/api/health/ready`| Readiness (same as `/api/health`) |
-| GET    | `/api/health/live` | Liveness (process up; always 200) |
-| GET    | `/api/trust/:address` | Trust score (stub) |
-| GET    | `/api/bond/:address`   | Bond status (stub) |
+| Method | Path                    | Description            |
+|--------|-------------------------|------------------------|
+| GET    | `/api/health`           | Health check           |
+| GET    | `/api/trust/:address`   | Trust score            |
+| GET    | `/api/bond/:address`    | Bond status (stub)     |
+
+Full request/response documentation, cURL examples, and import instructions:
+**[docs/api.md](docs/api.md)**
+
+### OpenAPI spec
+
+```
+docs/openapi.yaml
+```
+
+Render with `npx @redocly/cli preview-docs docs/openapi.yaml` or paste into [editor.swagger.io](https://editor.swagger.io).
+
+### Postman / Insomnia collection
+
+```
+docs/credence.postman_collection.json
+```
+
+Import via **File → Import** in Postman or Insomnia. See [docs/api.md](docs/api.md#importing-the-postman-collection) for step-by-step instructions and Newman CLI usage.
 
 ### Health endpoint (detailed)
 
@@ -107,6 +124,23 @@ When `RPC_URL` and `CONTRACT_ADDRESS` are provided via environment variables, th
 
 - **Upserts**: Attestations are synced natively to the PostgreSQL `attestations` table handling conflicts properly to avoid erroring on duplicate data.
 - **Cache Invalidation**: Triggers a cache purge for the user's reputation score via Redis.
+
+### Identity state sync
+
+The **identity state sync** listener keeps database identity and bond state in sync with on-chain state (reconciliation or full refresh). Use it to correct drift from missed events or for recovery.
+
+- **Location:** `src/listeners/identityStateSync.ts`
+- **Reconciliation by address:** `sync.reconcileByAddress(address)` – fetches current state from the contract, diffs with DB, and updates the store if there is drift.
+- **Full resync:** `sync.fullResync()` – reconciles all known identities (union of store and contract addresses). Use for recovery or bootstrap.
+
+You supply:
+
+- **ContractReader** – Fetches current bond/identity state from chain (e.g. Horizon or contract reads). Implement `getIdentityState(address)` and optionally `getAllIdentityAddresses()`.
+- **IdentityStateStore** – Your persistence layer (e.g. DB). Implement `get`, `set`, and `getAllAddresses`.
+
+State shape is `IdentityState`: `address`, `bondedAmount`, `bondStart`, `bondDuration`, `active`. See `src/listeners/types.ts`.
+
+Tests cover: no drift (no update), single drift (one address corrected), full resync (multiple drifts), chain missing, store-only addresses, and error handling.
 
 ## Tech
 

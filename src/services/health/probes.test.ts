@@ -20,6 +20,9 @@ vi.mock('ioredis', () => ({
   default: class {
     ping = () => Promise.resolve('PONG')
   },
+  Redis: class {
+    ping = () => Promise.resolve('PONG')
+  },
 }))
 
 describe('createDefaultProbes', () => {

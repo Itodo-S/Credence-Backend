@@ -17,9 +17,9 @@ vi.mock('pg', () => {
 
     return {
         default: {
-            Pool: vi.fn().mockImplementation(() => new MockPool())
+            Pool: vi.fn().mockImplementation(function () { return new MockPool(); })
         },
-        Pool: vi.fn().mockImplementation(() => new MockPool())
+        Pool: vi.fn().mockImplementation(function () { return new MockPool(); })
     };
 });
 

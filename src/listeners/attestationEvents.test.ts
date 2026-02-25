@@ -10,10 +10,12 @@ vi.mock('ethers', () => {
     return {
         ethers: {
             JsonRpcProvider: vi.fn(),
-            Contract: vi.fn().mockImplementation(() => ({
-                on: onMock,
-                removeAllListeners: removeAllListenersMock
-            }))
+            Contract: vi.fn().mockImplementation(function () {
+                return {
+                    on: onMock,
+                    removeAllListeners: removeAllListenersMock
+                };
+            })
         }
     };
 });

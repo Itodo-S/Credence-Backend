@@ -3,9 +3,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('ioredis', () => {
     return {
         default: {
-            default: vi.fn().mockImplementation(() => ({
-                del: vi.fn().mockResolvedValue(1)
-            }))
+            default: vi.fn().mockImplementation(function () {
+                return {
+                    del: vi.fn().mockResolvedValue(1)
+                };
+            })
         }
     };
 });
