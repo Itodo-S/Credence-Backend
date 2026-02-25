@@ -190,6 +190,28 @@ app.get('/api/bond/:address', requireApiKey(), (req, res) => {
   })
 })
 
+app.get('/api/attestations/:address', (req, res) => {
+  const { address } = req.params
+  res.json({
+    address,
+    attestations: [],
+    count: 0,
+  })
+})
+
+app.get('/api/verification/:address', (req, res) => {
+  const { address } = req.params
+  res.json({
+    address,
+    proof: null,
+    verified: false,
+    timestamp: null,
+  })
+})
+
+// Bulk verification endpoint (Enterprise)
+app.use('/api/bulk', bulkRouter)
+
 // Only start server if not in test environment
 if (process.env.NODE_ENV !== 'test') {
   app.listen(config.port, () => {
