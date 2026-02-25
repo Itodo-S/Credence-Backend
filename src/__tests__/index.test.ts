@@ -11,6 +11,10 @@ describe('API Endpoints', () => {
       expect(response.body).toEqual({
         status: 'ok',
         service: 'credence-backend',
+        dependencies: {
+          db: { status: 'not_configured' },
+          redis: { status: 'not_configured' }
+        }
       })
     })
   })
@@ -73,14 +77,14 @@ describe('API Endpoints', () => {
 })
 
 
-  describe('JSON Parsing', () => {
-    it('should handle valid JSON in request body', async () => {
-      const response = await request(app)
-        .post('/api/bulk/verify')
-        .set('X-API-Key', 'test-enterprise-key-12345')
-        .set('Content-Type', 'application/json')
-        .send(JSON.stringify({ addresses: ['GABC7IXPV3YWQXKQZQXQZQXQZQXQZQXQZQXQZQXQZQXQZQXQZQXQZQXQ'] }))
+describe('JSON Parsing', () => {
+  it('should handle valid JSON in request body', async () => {
+    const response = await request(app)
+      .post('/api/bulk/verify')
+      .set('X-API-Key', 'test-enterprise-key-12345')
+      .set('Content-Type', 'application/json')
+      .send(JSON.stringify({ addresses: ['GABC7IXPV3YWQXKQZQXQZQXQZQXQZQXQZQXQZQXQZQXQZQXQZQXQZQXQ'] }))
 
-      expect(response.status).toBe(200)
-    })
+    expect(response.status).toBe(200)
   })
+})
