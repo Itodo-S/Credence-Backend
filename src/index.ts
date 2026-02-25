@@ -182,7 +182,7 @@ app.get(
   requireApiKey,
   enforceQuota,
   (req, res) => {
-    const { address } = req.validated!.params!
+    const { address } = (req as any).validated!.params!
     // Placeholder: in production, fetch from DB / reputation engine
     res.json({
       address,
@@ -190,7 +190,7 @@ app.get(
       bondedAmount: '0',
       bondStart: null,
       attestationCount: 0,
-      _accessedWith: { scope: (req as any).apiKey?.scope, tier: (req as any).apiKeyRecord?.tier },
+      _accessedWith: { scope: (req as any).authKey?.scope, tier: (req as any).apiKeyRecord?.tier },
     })
   },
 )
@@ -202,14 +202,14 @@ app.get(
   requireApiKey,
   enforceQuota,
   (req, res) => {
-    const { address } = req.validated!.params!
+    const { address } = (req as any).validated!.params!
     res.json({
       address,
       bondedAmount: '0',
       bondStart: null,
       bondDuration: null,
       active: false,
-      _accessedWith: { scope: (req as any).apiKey?.scope, tier: (req as any).apiKeyRecord?.tier },
+      _accessedWith: { scope: (req as any).authKey?.scope, tier: (req as any).apiKeyRecord?.tier },
     })
   },
 )
@@ -224,8 +224,8 @@ app.get(
   '/api/attestations/:address',
   validate({ params: attestationsPathParamsSchema, query: attestationsQuerySchema }),
   (req, res) => {
-    const { address } = req.validated!.params!
-    const { limit, offset } = req.validated!.query!
+    const { address } = (req as any).validated!.params!
+    const { limit, offset } = (req as any).validated!.query!
     res.json({
       address,
       limit,
@@ -243,7 +243,7 @@ app.post(
   enforceQuota,
   validate({ body: createAttestationBodySchema }),
   (req, res) => {
-    const body = req.validated!.body!
+    const body: any = (req as any).validated!.body!
     res.status(201).json({
       subject: body.subject,
       value: body.value,

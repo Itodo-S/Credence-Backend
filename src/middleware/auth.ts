@@ -23,7 +23,7 @@ declare global {
  * Extended Express Request with API key metadata
  */
 export interface AuthenticatedRequest extends Request {
-  apiKey?: {
+  authKey?: {
     key: string;
     scope: ApiScope;
   };
@@ -94,7 +94,7 @@ function handleRequest(req: Request, res: Response, next: NextFunction, required
 
   // Attach both formats to support legacy and new features
   req.apiKeyRecord = record;
-  (req as AuthenticatedRequest).apiKey = { key: apiKey, scope };
+  (req as AuthenticatedRequest).authKey = { key: apiKey, scope };
 
   next();
 }
