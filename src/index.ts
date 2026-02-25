@@ -2,6 +2,7 @@ import express from 'express'
 import { createHealthRouter } from './routes/health.js'
 import { createDefaultProbes } from './services/health/probes.js'
 import { startGrpcServer } from './grpc/server.js'
+import bulkRouter from './routes/bulk.js'
 
 const app = express()
 const PORT = process.env.PORT ?? 3000
@@ -35,12 +36,17 @@ app.get('/api/bond/:address', (req, res) => {
   })
 })
 
+// Bulk verification endpoint (Enterprise)
+app.use('/api/bulk', bulkRouter)
+
 async function startServers() {
   try {
-    await startGrpcServer(GRPC_PORT);
-    app.listen(PORT, () => {
-      console.log(`Credence API listening on http://localhost:${PORT}`)
-    })
+    if (process.env.NODE_ENV !== 'test') {
+      await startGrpcServer(GRPC_PORT);
+      app.listen(PORT, () => {
+        console.log(`Credence API listening on http://localhost:${PORT}`)
+      })
+    }
   } catch (error) {
     console.error('Failed to start servers:', error);
     process.exit(1);
@@ -48,3 +54,5 @@ async function startServers() {
 }
 
 startServers();
+
+export default app
