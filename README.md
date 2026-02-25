@@ -21,6 +21,14 @@ This service is part of [Credence](../README.md). It will support:
 npm install
 ```
 
+### Environment Variables
+
+Required for production operations:
+- `DATABASE_URL`: PostgreSQL connection string (starts the DB pool, enables health check).
+- `REDIS_URL`: Redis connection string (enables caching and health check).
+- `RPC_URL`: JSON-RPC endpoint for blockchain (e.g. Alchemy, Infura).
+- `CONTRACT_ADDRESS`: Deployed attestation contract address on the target chain.
+
 ## Run locally
 
 **Development (watch mode):**
@@ -92,10 +100,19 @@ npm run test:coverage
 
 Scenarios covered: all dependencies up, DB down (503), Redis down (503), both down (503), only external down (200 degraded), liveness always 200, and no dependencies configured (200 ok).
 
+## Background Services
+
+### Attestation Event Listener
+When `RPC_URL` and `CONTRACT_ADDRESS` are provided via environment variables, the backend automatically starts an `ethers` event listener in the background. It listens to the contract for `Attested` and `Revoked` events. 
+
+- **Upserts**: Attestations are synced natively to the PostgreSQL `attestations` table handling conflicts properly to avoid erroring on duplicate data.
+- **Cache Invalidation**: Triggers a cache purge for the user's reputation score via Redis.
+
 ## Tech
 
 - Node.js
 - TypeScript
 - Express
-
-Extend with PostgreSQL, Redis, and Horizon event ingestion when implementing the full architecture.
+- PostgreSQL (`pg`)
+- Redis (`ioredis`)
+- Ethers.js (`ethers`)
