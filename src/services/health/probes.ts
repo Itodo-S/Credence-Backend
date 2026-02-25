@@ -74,9 +74,9 @@ export function createRedisProbe(options: RedisProbeOptions = {}): HealthProbe |
       }
       if (!client) {
         const Redis = (await import('ioredis')).default
-        client = new Redis(url!, { maxRetriesPerRequest: 1 })
+        client = new (Redis as any)(url!, { maxRetriesPerRequest: 1 })
       }
-      await withTimeout(client.ping(), CHECK_TIMEOUT_MS)
+      await withTimeout(client!.ping(), CHECK_TIMEOUT_MS)
       return { status: 'up' }
     } catch {
       return { status: 'down' }

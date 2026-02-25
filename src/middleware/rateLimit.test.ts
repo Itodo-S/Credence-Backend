@@ -5,8 +5,8 @@ import { SubscriptionTier } from '../types/subscription.js';
 import { Request, Response, NextFunction } from 'express';
 
 describe('Rate Limit Middleware', () => {
-    let req: Partial<Request>;
-    let res: Partial<Response>;
+    let req: any;
+    let res: any;
     let next: NextFunction;
 
     beforeEach(() => {

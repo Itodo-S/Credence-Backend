@@ -22,15 +22,15 @@ describe('Auth Middleware', () => {
     it('rejects if api key is missing', () => {
         requireApiKey(req as Request, res as Response, next);
         expect(res.status).toHaveBeenCalledWith(401);
-        expect(res.json).toHaveBeenCalledWith({ error: 'Missing x-api-key header' });
+        expect(res.json).toHaveBeenCalledWith({ error: 'Unauthorized', message: 'API key is required' });
         expect(next).not.toHaveBeenCalled();
     });
 
     it('rejects if api key is invalid', () => {
         req.headers!['x-api-key'] = 'invalid-key';
         requireApiKey(req as Request, res as Response, next);
-        expect(res.status).toHaveBeenCalledWith(403);
-        expect(res.json).toHaveBeenCalledWith({ error: 'Invalid or inactive API key' });
+        expect(res.status).toHaveBeenCalledWith(401);
+        expect(res.json).toHaveBeenCalledWith({ error: 'Unauthorized', message: 'Invalid or inactive API key' });
         expect(next).not.toHaveBeenCalled();
     });
 

@@ -5,6 +5,7 @@ import { requireApiKey } from './middleware/auth.js'
 import { enforceQuota } from './middleware/rateLimit.js'
 import { subscriptionService } from './services/subscriptions.js'
 import { SubscriptionTier } from './types/subscription.js'
+import bulkRouter from './routes/bulk.js'
 
 // Seed test keys for development
 subscriptionService.registerKey('test-free-key', SubscriptionTier.FREE);
@@ -42,6 +43,14 @@ app.get('/api/bond/:address', requireApiKey, enforceQuota, (req, res) => {
   })
 })
 
-app.listen(PORT, () => {
-  console.log(`Credence API listening on http://localhost:${PORT}`)
-})
+// Bulk verification endpoint (Enterprise)
+app.use('/api/bulk', bulkRouter)
+
+// Only start server if not in test environment
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`Credence API listening on http://localhost:${PORT}`)
+  })
+}
+
+export default app
