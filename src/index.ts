@@ -1,6 +1,7 @@
 import express from 'express'
 import { createHealthRouter } from './routes/health.js'
 import { createDefaultProbes } from './services/health/probes.js'
+import bulkRouter from './routes/bulk.js'
 import { validate } from './middleware/validate.js'
 import {
   trustPathParamsSchema,
@@ -81,7 +82,11 @@ app.post(
   },
 )
 
+// Bulk verification endpoint (Enterprise)
+app.use('/api/bulk', bulkRouter)
+
 export { app }
+export default app
 
 if (process.env.NODE_ENV !== 'test') {
   app.listen(PORT, () => {
