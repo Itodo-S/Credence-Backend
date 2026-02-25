@@ -1,6 +1,15 @@
 import express from 'express'
 import { createHealthRouter } from './routes/health.js'
 import { createDefaultProbes } from './services/health/probes.js'
+import { requireApiKey } from './middleware/auth.js'
+import { enforceQuota } from './middleware/rateLimit.js'
+import { subscriptionService } from './services/subscriptions.js'
+import { SubscriptionTier } from './types/subscription.js'
+
+// Seed test keys for development
+subscriptionService.registerKey('test-free-key', SubscriptionTier.FREE);
+subscriptionService.registerKey('test-pro-key', SubscriptionTier.PRO);
+subscriptionService.registerKey('test-enterprise-key', SubscriptionTier.ENTERPRISE, true);
 
 const app = express()
 const PORT = process.env.PORT ?? 3000
@@ -10,7 +19,7 @@ app.use(express.json())
 const healthProbes = createDefaultProbes()
 app.use('/api/health', createHealthRouter(healthProbes))
 
-app.get('/api/trust/:address', (req, res) => {
+app.get('/api/trust/:address', requireApiKey, enforceQuota, (req, res) => {
   const { address } = req.params
   // Placeholder: in production, fetch from DB / reputation engine
   res.json({
@@ -22,7 +31,7 @@ app.get('/api/trust/:address', (req, res) => {
   })
 })
 
-app.get('/api/bond/:address', (req, res) => {
+app.get('/api/bond/:address', requireApiKey, enforceQuota, (req, res) => {
   const { address } = req.params
   res.json({
     address,
