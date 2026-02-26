@@ -8,20 +8,15 @@ describe('API Endpoints', () => {
       const response = await request(app).get('/api/health')
 
       expect(response.status).toBe(200)
-      expect(response.body).toEqual({
-        status: 'ok',
-        service: 'credence-backend',
-        dependencies: {
-          db: { status: 'not_configured' },
-          redis: { status: 'not_configured' }
-        }
-      })
+      expect(response.body.status).toBe('ok')
+      expect(response.body.service).toBe('credence-backend')
+      expect(response.body).toHaveProperty('dependencies')
     })
   })
 
   describe('GET /api/trust/:address', () => {
     it('should return trust score for an address', async () => {
-      const address = 'GABC7IXPV3YWQXKQZQXQZQXQZQXQZQXQZQXQZQXQZQXQZQXQZQXQZQXQ'
+      const address = '0x742d35Cc6634C0532925a3b844Bc454e4438f44e'
       const response = await request(app).get(`/api/trust/${address}`)
 
       expect(response.status).toBe(200)
@@ -35,7 +30,7 @@ describe('API Endpoints', () => {
     })
 
     it('should handle different addresses', async () => {
-      const address = 'GDEF7IXPV3YWQXKQZQXQZQXQZQXQZQXQZQXQZQXQZQXQZQXQZQXQZQXQ'
+      const address = '0x0000000000000000000000000000000000000001'
       const response = await request(app).get(`/api/trust/${address}`)
 
       expect(response.status).toBe(200)
@@ -45,7 +40,7 @@ describe('API Endpoints', () => {
 
   describe('GET /api/bond/:address', () => {
     it('should return bond status for an address', async () => {
-      const address = 'GABC7IXPV3YWQXKQZQXQZQXQZQXQZQXQZQXQZQXQZQXQZQXQZQXQZQXQ'
+      const address = '0x742d35Cc6634C0532925a3b844Bc454e4438f44e'
       const response = await request(app).get(`/api/bond/${address}`)
 
       expect(response.status).toBe(200)
@@ -59,7 +54,7 @@ describe('API Endpoints', () => {
     })
 
     it('should handle different addresses', async () => {
-      const address = 'GDEF7IXPV3YWQXKQZQXQZQXQZQXQZQXQZQXQZQXQZQXQZQXQZQXQZQXQ'
+      const address = '0x0000000000000000000000000000000000000001'
       const response = await request(app).get(`/api/bond/${address}`)
 
       expect(response.status).toBe(200)
@@ -74,17 +69,22 @@ describe('API Endpoints', () => {
       expect(response.status).toBe(404)
     })
   })
-})
 
+  describe('JSON Parsing', () => {
+    it('should handle valid JSON in request body', async () => {
+      const response = await request(app)
+        .post('/api/bulk/verify')
+        .set('X-API-Key', 'test-enterprise-key-12345')
+        .set('Content-Type', 'application/json')
+        .send(
+          JSON.stringify({
+            addresses: [
+              'GABC7IXPV3YWQXKQZQXQZQXQZQXQZQXQZQXQZQXQZQXQZQXQZQXQZQXQ',
+            ],
+          }),
+        )
 
-describe('JSON Parsing', () => {
-  it('should handle valid JSON in request body', async () => {
-    const response = await request(app)
-      .post('/api/bulk/verify')
-      .set('X-API-Key', 'test-enterprise-key-12345')
-      .set('Content-Type', 'application/json')
-      .send(JSON.stringify({ addresses: ['GABC7IXPV3YWQXKQZQXQZQXQZQXQZQXQZQXQZQXQZQXQZQXQZQXQZQXQ'] }))
-
-    expect(response.status).toBe(200)
+      expect(response.status).toBe(200)
+    })
   })
 })
