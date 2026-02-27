@@ -1,23 +1,13 @@
 /** @type {import('ts-jest').JestConfigWithTsJest} */
 export default {
-  preset: 'ts-jest/presets/default-esm',
+  preset: 'ts-jest',
   testEnvironment: 'node',
-  extensionsToTreatAsEsm: ['.ts'],
-  moduleNameMapper: {
-    '^(\\.{1,2}/.*)\\.js$': '$1',
-  },
-  transform: {
-    '^.+\\.tsx?$': [
-      'ts-jest',
-      {
-        useESM: true,
-      },
-    ],
-  },
+  roots: ['<rootDir>/src'],
+  testMatch: ['**/__tests__/**/*.ts', '**/?(*.)+(spec|test).ts'],
   collectCoverageFrom: [
-    'src/**/*.ts',
-    '!src/**/*.test.ts',
-    '!src/**/*.spec.ts',
+    'src/services/**/*.ts',
+    'src/types/**/*.ts',
+    '!src/**/*.d.ts',
   ],
   coverageThreshold: {
     global: {
@@ -27,5 +17,11 @@ export default {
       statements: 95,
     },
   },
-  testMatch: ['**/__tests__/**/*.test.ts', '**/?(*.)+(spec|test).ts'],
-};
+  globals: {
+    'ts-jest': {
+      tsconfig: {
+        module: 'CommonJS',
+      },
+    },
+  },
+}

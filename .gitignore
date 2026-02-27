@@ -7,7 +7,6 @@ coverage
 .env
 .env.*
 !.env.example
-coverage
 
 # Monitoring data
 monitoring/data/
