@@ -2,6 +2,16 @@
  * RBAC middleware + RoleService tests.
  * No database required – all tests run in memory.
  *
+<<<<<<< HEAD
+ * Run:  npx vitest run tests/rbac.test.ts
+ */
+
+import { describe, it, expect, beforeEach, vi } from 'vitest'
+import type { Request, Response, NextFunction } from 'express'
+import { requireRole, requireMinRole, requireAnyRole } from '../src/middleware/rbac.js'
+import { RoleService } from '../src/services/roles.js'
+import type { Role } from '../src/types/rbac.js'
+=======
  * Run:  npx jest tests/rbac.test.ts
  */
 
@@ -9,6 +19,7 @@ import type { Request, Response, NextFunction } from 'express'
 import { requireRole, requireMinRole, requireAnyRole } from '../src/middleware/rbac'
 import { RoleService } from '../src/services/roles'
 import type { Role } from '../src/types/rbac'
+>>>>>>> upstream/main
 
 
 // ---------------------------------------------------------------------------
@@ -37,10 +48,17 @@ function makeRes(): Response & { _status: number; _body: unknown } {
      return res
 }
 
+<<<<<<< HEAD
+const next: NextFunction = vi.fn()
+
+beforeEach(() => {
+     vi.clearAllMocks()
+=======
 const next: NextFunction = jest.fn()
 
 beforeEach(() => {
      jest.clearAllMocks()
+>>>>>>> upstream/main
 })
 
 // ---------------------------------------------------------------------------
@@ -86,7 +104,11 @@ describe('requireRole()', () => {
                mw(makeReq({ id: '1', address: '0x1', role: 'admin' }), resAdmin, next)
                expect(next).toHaveBeenCalledTimes(1)
 
+<<<<<<< HEAD
+               vi.clearAllMocks()
+=======
                jest.clearAllMocks()
+>>>>>>> upstream/main
 
                const resVerifier = makeRes()
                mw(makeReq({ id: '2', address: '0x2', role: 'verifier' }), resVerifier, next)
@@ -153,7 +175,11 @@ describe('requireMinRole()', () => {
           test.each(cases)(
                'caller=%s minRole=%s → allowed=%s',
                (callerRole, minRole, expectAllowed) => {
+<<<<<<< HEAD
+                    vi.clearAllMocks()
+=======
                     jest.clearAllMocks()
+>>>>>>> upstream/main
                     const mw = requireMinRole(minRole)
                     const res = makeRes()
                     mw(makeReq({ id: '1', address: '0x1', role: callerRole }), res, next)
@@ -186,7 +212,11 @@ describe('requireAnyRole()', () => {
 
      const roles: Role[] = ['admin', 'verifier', 'user', 'public']
      test.each(roles)('calls next for role=%s', (role) => {
+<<<<<<< HEAD
+          vi.clearAllMocks()
+=======
           jest.clearAllMocks()
+>>>>>>> upstream/main
           const mw = requireAnyRole()
           const res = makeRes()
           mw(makeReq({ id: '1', address: '0x1', role }), res, next)

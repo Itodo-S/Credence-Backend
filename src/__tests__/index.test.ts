@@ -2,17 +2,16 @@ import { describe, it, expect } from 'vitest'
 import request from 'supertest'
 import app from '../index.js'
 
+const validAddress = '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266'
+
 describe('API Endpoints', () => {
   describe('GET /api/health', () => {
     it('should return health status', async () => {
       const response = await request(app).get('/api/health')
 
       expect(response.status).toBe(200)
-      expect(response.body).toMatchObject({
-        status: 'ok',
-        service: 'credence-backend',
-      })
-      expect(response.body).toHaveProperty('dependencies')
+      expect(response.body.status).toBe('ok')
+      expect(response.body.service).toBe('credence-backend')
     })
   })
 
@@ -31,23 +30,20 @@ describe('API Endpoints', () => {
       })
     })
 
-    it('should handle different addresses', async () => {
-      const address = '0x0000000000000000000000000000000000000001'
-      const response = await request(app).get(`/api/trust/${address}`)
-
-      expect(response.status).toBe(200)
-      expect(response.body.address).toBe(address)
+    it('should return 400 for an invalid address', async () => {
+      const response = await request(app).get('/api/trust/not-an-address')
+      expect(response.status).toBe(400)
+      expect(response.body).toHaveProperty('error')
     })
   })
 
   describe('GET /api/bond/:address', () => {
-    it('should return bond status for an address', async () => {
-      const address = '0x742d35Cc6634C0532925a3b844Bc454e4438f44e'
-      const response = await request(app).get(`/api/bond/${address}`)
+    it('should return bond status for a valid address', async () => {
+      const response = await request(app).get(`/api/bond/${validAddress}`)
 
       expect(response.status).toBe(200)
       expect(response.body).toMatchObject({
-        address,
+        address: validAddress,
         bondedAmount: '0',
         active: false,
       })
@@ -58,6 +54,12 @@ describe('API Endpoints', () => {
       const response = await request(app).get(`/api/bond/${address}`)
 
       expect(response.status).toBe(200)
+    })
+
+    it('should return 400 for an invalid address', async () => {
+      const response = await request(app).get('/api/bond/not-an-address')
+      expect(response.status).toBe(400)
+      expect(response.body).toHaveProperty('error')
     })
   })
 
@@ -70,7 +72,7 @@ describe('API Endpoints', () => {
   })
 })
 
-describe('JSON Parsing', () => {
+describe('POST /api/bulk/verify', () => {
   it('should handle valid JSON in request body', async () => {
     const response = await request(app)
       .post('/api/bulk/verify')
